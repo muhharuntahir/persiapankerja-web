@@ -223,6 +223,29 @@ export const getLessonPercentage = cache(async () => {
 =============================== */
 const DAY = 86_400_000;
 
+// export const getUserSubscription = cache(async () => {
+//   const supabase = createServerSupabaseClient();
+
+//   const {
+//     data: { user },
+//   } = await supabase.auth.getUser();
+
+//   if (!user) return null;
+
+//   const data = await db.query.userSubscription.findFirst({
+//     where: eq(userSubscription.userId, user.id),
+//   });
+
+//   if (!data) return null;
+
+//   const isActive = data.paymentStatus === "paid";
+
+//   return {
+//     ...data,
+//     isActive,
+//   };
+// });
+
 export const getUserSubscription = cache(async () => {
   const supabase = createServerSupabaseClient();
 
@@ -238,11 +261,9 @@ export const getUserSubscription = cache(async () => {
 
   if (!data) return null;
 
-  const isActive = data.paymentStatus === "paid";
-
   return {
     ...data,
-    isActive,
+    isActive: data.paymentStatus === "success",
   };
 });
 

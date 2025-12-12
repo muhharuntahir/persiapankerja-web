@@ -40,23 +40,12 @@ export const createMidtransPayment = async () => {
   const transaction = await midtrans.createTransaction(parameter);
 
   // 5. Save pending subscription
-  await db
-    .insert(userSubscription)
-    .values({
-      userId: user.id,
-      orderId,
-      paymentStatus: "pending",
-      grossAmount: PRICE,
-    })
-    .onConflictDoUpdate({
-      target: userSubscription.userId,
-      set: {
-        orderId,
-        paymentStatus: "pending",
-        grossAmount: PRICE,
-        // boleh tambah field lain jika mau
-      },
-    });
+  await db.insert(userSubscription).values({
+    userId: user.id,
+    orderId: orderId,
+    paymentStatus: "pending",
+    grossAmount: PRICE,
+  });
 
   // 6. Return Snap Token to FE
   return {
