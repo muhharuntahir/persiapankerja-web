@@ -1,22 +1,24 @@
+// app/api/webhooks/midtrans/route.ts
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+
 import db from "@/db/drizzle";
 import { userSubscription } from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    console.log("MIDTRANS WEBHOOK BODY:", body);
+    console.log("📩 MIDTRANS WEBHOOK BODY:", body);
 
-    const transactionStatus = body.transaction_status;
     const orderId = body.order_id;
+    const transactionStatus = body.transaction_status;
 
     if (!orderId) {
       return NextResponse.json({ error: "Missing order_id" }, { status: 400 });
     }
 
-    // Jika pembayaran sukses
+    // 🎉 Payment success
     if (transactionStatus === "settlement") {
       const expiresAt = new Date();
       expiresAt.setFullYear(expiresAt.getFullYear() + 1); // aktif 1 tahun
@@ -26,17 +28,22 @@ export async function POST(req: Request) {
         .set({
           paymentStatus: "paid",
           isActive: true,
-          expiresAt: expiresAt,
+          expiresAt,
         })
         .where(eq(userSubscription.orderId, orderId));
+
+      console.log("🎉 User subscription updated:", orderId);
 
       return NextResponse.json({ message: "Subscription activated" });
     }
 
-    // Jika pembayaran masih pending atau lainnya
+    // Status lain: pending, deny, cancel, expire, refund
     return NextResponse.json({ message: "No action taken" });
-  } catch (error: any) {
-    console.error("Midtrans webhook error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    console.error("❌ Midtrans webhook error:", err);
+    return NextResponse.json(
+      { error: err.message ?? "Unknown error" },
+      { status: 500 }
+    );
   }
 }

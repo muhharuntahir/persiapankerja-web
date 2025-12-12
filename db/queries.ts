@@ -222,7 +222,7 @@ export const getLessonPercentage = cache(async () => {
    USER SUBSCRIPTION (Stripe)
 =============================== */
 const DAY = 86_400_000;
-export const getUserSubscription = async () => {
+export const getUserSubscription = cache(async () => {
   const supabase = createServerSupabaseClient();
 
   const {
@@ -231,12 +231,17 @@ export const getUserSubscription = async () => {
 
   if (!user) return null;
 
-  const data = await db.query.userSubscription.findFirst({
+  // Ambil subscription terbaru
+  const subscriptions = await db.query.userSubscription.findMany({
     where: eq(userSubscription.userId, user.id),
+    orderBy: (t, { desc }) => [desc(t.createdAt)],
+    limit: 1,
   });
 
+  const data = subscriptions[0];
   if (!data) return null;
 
+  // Hitung status aktif
   const now = new Date();
   const isActive =
     data.paymentStatus === "paid" &&
@@ -248,7 +253,7 @@ export const getUserSubscription = async () => {
     ...data,
     isActive: Boolean(isActive),
   };
-};
+});
 
 /* ============================
    TOP 10 USERS (LEADERBOARD)
