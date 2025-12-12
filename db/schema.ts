@@ -142,8 +142,9 @@ export const userSubscription = pgTable("user_subscription", {
   orderId: text("order_id").notNull().unique(), // untuk simpan order
   paymentStatus: text("payment_status").notNull().default("pending"),
   grossAmount: integer("gross_amount").notNull(),
+  expiresAt: timestamp("expires_at"),
   isActive: boolean("is_active").default(false),
-
+  createdAt: timestamp("created_at").defaultNow(),
   // OPTIONAL — update ketika payment selesai
   paymentType: text("payment_type"),
   transactionTime: timestamp("transaction_time"),

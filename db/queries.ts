@@ -223,47 +223,34 @@ export const getLessonPercentage = cache(async () => {
 =============================== */
 const DAY = 86_400_000;
 
-// export const getUserSubscription = cache(async () => {
-//   const supabase = createServerSupabaseClient();
-
-//   const {
-//     data: { user },
-//   } = await supabase.auth.getUser();
-
-//   if (!user) return null;
-
-//   const data = await db.query.userSubscription.findFirst({
-//     where: eq(userSubscription.userId, user.id),
-//   });
-
-//   if (!data) return null;
-
-//   const isActive = data.paymentStatus === "paid";
-
-//   return {
-//     ...data,
-//     isActive,
-//   };
-// });
-
 export const getUserSubscription = cache(async () => {
   const supabase = createServerSupabaseClient();
 
+  // Ambil user login
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) return null;
 
+  // Ambil subscription dari DB
   const data = await db.query.userSubscription.findFirst({
     where: eq(userSubscription.userId, user.id),
   });
 
   if (!data) return null;
 
+  // Logika aktif / tidak aktif
+  const now = new Date();
+  const isActive =
+    data.paymentStatus === "paid" &&
+    data.isActive &&
+    data.expiresAt &&
+    new Date(data.expiresAt) > now;
+
   return {
     ...data,
-    isActive: data.paymentStatus === "success",
+    isActive,
   };
 });
 

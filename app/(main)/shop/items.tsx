@@ -33,11 +33,15 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
       createMidtransPayment()
         .then((res: any) => {
           if (res?.redirectUrl) {
-            window.location.href = res.redirectUrl; // buka Snap page Midtrans
+            window.location.href = res.redirectUrl;
           }
         })
         .catch(() => toast.error("Something went wrong"));
     });
+  };
+
+  const onSettings = () => {
+    window.location.href = "/settings/subscription";
   };
 
   return (
@@ -70,7 +74,10 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
             Unlimited hearts
           </p>
         </div>
-        <Button onClick={onUpgrade} disabled={pending}>
+        <Button
+          onClick={hasActiveSubscription ? onSettings : onUpgrade}
+          disabled={pending}
+        >
           {hasActiveSubscription ? "settings" : "upgrade"}
         </Button>
       </div>
