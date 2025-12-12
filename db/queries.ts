@@ -244,7 +244,7 @@ export const getUserSubscription = cache(async () => {
   const now = new Date();
   const isActive =
     data.paymentStatus === "paid" &&
-    // data.isActive &&
+    data.isActive === true &&
     data.expiresAt &&
     new Date(data.expiresAt) > now;
 
