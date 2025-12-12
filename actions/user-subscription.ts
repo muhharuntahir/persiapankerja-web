@@ -39,26 +39,32 @@ export const createMidtransPayment = async () => {
   const transaction = await midtrans.createTransaction(parameter);
 
   // 5. UPSERT (jika ada → update, jika belum → insert)
-  await db
-    .insert(userSubscription)
-    .values({
-      userId: user.id,
-      orderId,
-      paymentStatus: "pending",
-      grossAmount: PRICE,
-      isActive: false,
-      expiresAt: null,
-    })
-    .onConflictDoUpdate({
-      target: userSubscription.userId,
-      set: {
-        orderId,
-        paymentStatus: "pending",
-        grossAmount: PRICE,
-        isActive: false,
-        expiresAt: null,
-      },
-    });
+  await db.insert(userSubscription).values({
+    userId: user.id,
+    orderId,
+    paymentStatus: "pending",
+    grossAmount: PRICE,
+  });
+  // await db
+  //   .insert(userSubscription)
+  //   .values({
+  //     userId: user.id,
+  //     orderId,
+  //     paymentStatus: "pending",
+  //     grossAmount: PRICE,
+  //     isActive: false,
+  //     expiresAt: null,
+  //   })
+  //   .onConflictDoUpdate({
+  //     target: userSubscription.userId,
+  //     set: {
+  //       orderId,
+  //       paymentStatus: "pending",
+  //       grossAmount: PRICE,
+  //       isActive: false,
+  //       expiresAt: null,
+  //     },
+  //   });
 
   // 6. Return Snap Token
   return {

@@ -136,11 +136,11 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
 
 export const userSubscription = pgTable("user_subscription", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull().unique(),
+  userId: text("user_id").notNull(),
 
   // MIDTRANS FIELDS
   orderId: text("order_id").notNull().unique(), // untuk simpan order
-  paymentStatus: text("payment_status").notNull().default("pending"),
+  paymentStatus: text("payment_status").notNull(),
   grossAmount: integer("gross_amount").notNull(),
   expiresAt: timestamp("expires_at"),
   isActive: boolean("is_active").notNull().default(false),

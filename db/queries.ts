@@ -241,12 +241,14 @@ export const getUserSubscription = cache(async () => {
   if (!data) return null;
 
   // Logika aktif / tidak aktif
-  const now = new Date();
   const isActive =
-    data.paymentStatus === "paid" &&
-    data.isActive === true &&
-    data.expiresAt &&
-    new Date(data.expiresAt) > now;
+    data.isActive && data.expiresAt && data.expiresAt > new Date();
+  // const now = new Date();
+  // const isActive =
+  //   data.paymentStatus === "paid" &&
+  //   data.isActive === true &&
+  //   data.expiresAt &&
+  //   new Date(data.expiresAt) > now;
 
   return {
     ...data,
