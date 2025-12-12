@@ -222,39 +222,33 @@ export const getLessonPercentage = cache(async () => {
    USER SUBSCRIPTION (Stripe)
 =============================== */
 const DAY = 86_400_000;
-
-export const getUserSubscription = cache(async () => {
+export const getUserSubscription = async () => {
   const supabase = createServerSupabaseClient();
 
-  // Ambil user login
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) return null;
 
-  // Ambil subscription dari DB
   const data = await db.query.userSubscription.findFirst({
     where: eq(userSubscription.userId, user.id),
   });
 
   if (!data) return null;
 
-  // Logika aktif / tidak aktif
+  const now = new Date();
   const isActive =
-    data.isActive && data.expiresAt && data.expiresAt > new Date();
-  // const now = new Date();
-  // const isActive =
-  //   data.paymentStatus === "paid" &&
-  //   data.isActive === true &&
-  //   data.expiresAt &&
-  //   new Date(data.expiresAt) > now;
+    data.paymentStatus === "paid" &&
+    data.isActive === true &&
+    data.expiresAt &&
+    new Date(data.expiresAt) > now;
 
   return {
     ...data,
     isActive: Boolean(isActive),
   };
-});
+};
 
 /* ============================
    TOP 10 USERS (LEADERBOARD)
