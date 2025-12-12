@@ -244,13 +244,13 @@ export const getUserSubscription = cache(async () => {
   const now = new Date();
   const isActive =
     data.paymentStatus === "paid" &&
-    data.isActive &&
+    // data.isActive &&
     data.expiresAt &&
     new Date(data.expiresAt) > now;
 
   return {
     ...data,
-    isActive,
+    isActive: Boolean(isActive),
   };
 });
 
