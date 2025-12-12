@@ -13,7 +13,7 @@ export const Header = () => {
 
   useEffect(() => {
     supabase.auth.getUser().then((res) => setUser(res.data.user ?? null));
-  }, []);
+  }, [supabase]);
 
   const logout = async () => {
     await supabase.auth.signOut();

@@ -24,7 +24,7 @@ export const Sidebar = ({ className }: Props) => {
       setUser(res.data.user ?? null);
       setLoading(false);
     });
-  }, []);
+  }, [supabase]);
 
   const logout = async () => {
     await supabase.auth.signOut();
