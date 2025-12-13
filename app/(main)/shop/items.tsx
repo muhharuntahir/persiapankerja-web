@@ -50,7 +50,7 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
         <Image src="/heart.svg" alt="Heart" height={60} width={60} />
         <div className="flex-1">
           <p className="text-neutral-700 text-base lg:text-xl font-bold">
-            Refill hearts
+            Isi Hati
           </p>
         </div>
         <Button
@@ -71,7 +71,7 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
         <Image src="/unlimited.svg" alt="Unlimited" height={60} width={60} />
         <div className="flex-1">
           <p className="text-neutral-700 text-base lg:text-xl font-bold">
-            Unlimited hearts
+            Hati Tak Terbatas
           </p>
         </div>
         <Button

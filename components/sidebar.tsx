@@ -42,22 +42,22 @@ export const Sidebar = ({ className }: Props) => {
       <Link href="/learn">
         <div className="pt-8 pl-4 pb-7 flex items-center gap-x-3">
           <Image src="/mascot.svg" height={40} width={40} alt="Mascot" />
-          <h1 className="text-2xl font-extrabold text-green-600 tracking-wide">
-            Lingo
+          <h1 className="text-xl font-extrabold text-sky-600 tracking-wide leading-none">
+            Persiapan Kerja
           </h1>
         </div>
       </Link>
 
       {/* MENU UTAMA */}
       <div className="flex flex-col gap-y-2 flex-1">
-        <SidebarItem label="Learn" href="/learn" iconSrc="/learn.svg" />
+        <SidebarItem label="Persiapan" href="/learn" iconSrc="/learn.svg" />
         <SidebarItem
-          label="Leaderboard"
+          label="Peringkat"
           href="/leaderboard"
           iconSrc="/leaderboard.svg"
         />
-        <SidebarItem label="Quests" href="/quests" iconSrc="/quests.svg" />
-        <SidebarItem label="Shop" href="/shop" iconSrc="/shop.svg" />
+        <SidebarItem label="Misi" href="/quests" iconSrc="/quests.svg" />
+        <SidebarItem label="Toko" href="/shop" iconSrc="/shop.svg" />
       </div>
 
       {/* AUTH SECTION */}

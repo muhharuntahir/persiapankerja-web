@@ -52,10 +52,10 @@ const LearderboardPage = async () => {
             width={90}
           />
           <h1 className="text-center font-bold text-neutral-800 text-2xl my-6">
-            Leaderboard
+            Papan Peringkat
           </h1>
           <p className="text-muted-foreground text-center text-lg mb-6">
-            See where you stand among other learners in the community.
+            Lihat posisi Anda di antara para pelajar lain di komunitas ini.
           </p>
           <Separator className="mb-4 h-0.5 rounded-full" />
           {leaderboard.map((userProgress, index) => (
