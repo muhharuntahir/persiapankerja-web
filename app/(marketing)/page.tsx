@@ -28,7 +28,7 @@ export default async function Home() {
           {!user ? (
             <>
               <Button size="lg" variant="secondary" className="w-full" asChild>
-                <Link href="/auth/register">Get Started</Link>
+                <Link href="/auth/register">Mulai</Link>
               </Button>
 
               <Button
@@ -37,7 +37,7 @@ export default async function Home() {
                 className="w-full"
                 asChild
               >
-                <Link href="/auth/login">I already have an account</Link>
+                <Link href="/auth/login">Saya sudah memiliki akun</Link>
               </Button>
             </>
           ) : (
