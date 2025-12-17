@@ -2,6 +2,7 @@ import {
   getMaterialsByUnit,
   getMaterialById,
   getUnitBySlug,
+  getNextLessonLinkByUnit,
 } from "@/db/queries";
 
 import { MaterialHeader } from "../../header";
@@ -35,6 +36,12 @@ export default async function MaterialPage({ params }: PageProps) {
   const material = await getMaterialById(Number(materialId), unit.id, user.id);
   if (!material) notFound();
 
+  const total = materials.length;
+  const completedCount = materials.filter((m) => m.completed).length;
+  const progress = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+  const nextLessonLink = await getNextLessonLinkByUnit(unit.id, user.id);
+
   return (
     <>
       <MaterialHeader unitTitle={unit.title} />
@@ -51,6 +58,8 @@ export default async function MaterialPage({ params }: PageProps) {
               currentId={material.id}
               unitSlug={unit.slug}
               completed={!!material.completed}
+              userId={user.id}
+              nextLessonLink={nextLessonLink}
             />
           </div>
         </main>
@@ -61,6 +70,7 @@ export default async function MaterialPage({ params }: PageProps) {
             materials={materials}
             currentId={material.id}
             unitSlug={unit.slug}
+            progress={progress}
           />
         </aside>
       </div>

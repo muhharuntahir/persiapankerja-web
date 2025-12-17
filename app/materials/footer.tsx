@@ -1,6 +1,8 @@
-import Link from "next/link";
+"use client";
 
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { MarkMaterialCompleteButton } from "./mark-complete-button";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface Props {
   materials: {
@@ -11,6 +13,8 @@ interface Props {
   currentId: number;
   unitSlug: string;
   completed: boolean;
+  userId: string;
+  nextLessonLink?: string | null;
 }
 
 export default function MaterialFooter({
@@ -18,6 +22,8 @@ export default function MaterialFooter({
   currentId,
   unitSlug,
   completed,
+  userId,
+  nextLessonLink,
 }: Props) {
   const index = materials.findIndex((m) => m.id === currentId);
   const prev = materials[index - 1];
@@ -25,31 +31,46 @@ export default function MaterialFooter({
   const current = materials[index];
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-30 mt-12 p-6 border-t flex items-center justify-between bg-white">
+    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t p-6 flex justify-between items-center z-30">
+      {/* PREVIOUS */}
       {prev ? (
         <Link
           href={`/materials/${unitSlug}/${prev.id}`}
-          className="text-sky-600"
+          className="flex items-center space-x-2"
         >
-          ← {prev.title}
+          <ArrowLeft className="h-4 w-4" />
+          <span>{prev.title}</span>
         </Link>
       ) : (
         <span />
       )}
 
+      {/* CURRENT */}
       <span className="font-medium">{current.title}</span>
 
-      {completed && next ? (
-        <Link
-          href={`/materials/${unitSlug}/${next.id}`}
-          className="text-sky-600"
-        >
-          {next.title} →
-        </Link>
+      {/* RIGHT ACTION */}
+      {completed ? (
+        next ? (
+          <Link
+            href={`/materials/${unitSlug}/${next.id}`}
+            className="flex items-center space-x-2"
+          >
+            <span>{next.title}</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        ) : nextLessonLink ? (
+          <Link
+            href={nextLessonLink}
+            className="text-sky-600 font-semibold flex items-center space-x-2"
+          >
+            <span>Masuk ke Latihan</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        ) : (
+          <span />
+        )
       ) : (
-        <button className="text-sky-600 font-medium">
-          Tandai sudah dipelajari
-        </button>
+        <MarkMaterialCompleteButton materialId={currentId} userId={userId} />
       )}
     </footer>
   );

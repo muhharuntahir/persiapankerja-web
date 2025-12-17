@@ -7,6 +7,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const courses = pgTable("courses", {
@@ -172,15 +173,24 @@ export const materialsRelations = relations(materials, ({ one, many }) => ({
   progress: many(materialProgress), // ✅ INI PENTING
 }));
 
-export const materialProgress = pgTable("material_progress", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
-  materialId: integer("material_id")
-    .references(() => materials.id, { onDelete: "cascade" })
-    .notNull(),
-  completed: boolean("completed").default(false),
-  completedAt: timestamp("completed_at"),
-});
+export const materialProgress = pgTable(
+  "material_progress",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    materialId: integer("material_id")
+      .references(() => materials.id, { onDelete: "cascade" })
+      .notNull(),
+    completed: boolean("completed").default(false),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => ({
+    userMaterialUnique: uniqueIndex("material_user_unique").on(
+      table.materialId,
+      table.userId
+    ),
+  })
+);
 
 export const materialProgressRelations = relations(
   materialProgress,

@@ -14,7 +14,7 @@ export const MaterialHeader = ({ unitTitle }: MaterialHeaderProps) => {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-sky-600"
         >
           <ArrowLeft className="h-4 w-4" />
-          Kembali
+          <span className="hidden lg:inline">Kembali</span>
         </Link>
 
         <div className="h-5 w-px bg-neutral-300 mx-2" />

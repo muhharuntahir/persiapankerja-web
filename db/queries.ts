@@ -317,6 +317,24 @@ export const getMaterialsByUnit = async (unitId: number, userId: string) => {
   }));
 };
 
+export const getMaterialProgressByUnit = async (
+  unitId: number,
+  userId: string
+) => {
+  const materials = await getMaterialsByUnit(unitId, userId);
+
+  const completedCount = materials.filter((m) => m.completed).length;
+
+  return {
+    completedCount,
+    total: materials.length,
+    percentage:
+      materials.length === 0
+        ? 0
+        : Math.round((completedCount / materials.length) * 100),
+  };
+};
+
 /**
  * Ambil 1 materi + status completed user
  */
@@ -358,4 +376,20 @@ export const getFirstMaterialByUnitSlug = async (unitSlug: string) => {
     where: eq(materials.unitId, unit.id),
     orderBy: (m, { asc }) => [asc(m.order)],
   });
+};
+
+/*
+ ** Next Lesson Link By Unit
+ */
+export const getNextLessonLinkByUnit = async (
+  unitId: number,
+  userId: string
+) => {
+  // ambil lesson pertama yang BELUM selesai
+  const lesson = await db.query.lessons.findFirst({
+    where: eq(lessons.unitId, unitId),
+    orderBy: (l, { asc }) => [asc(l.order)],
+  });
+
+  return lesson ? `/lesson/${lesson.id}` : null;
 };
