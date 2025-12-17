@@ -46,17 +46,45 @@ const main = async () => {
         {
           courseId: course.id,
           title: "Unit 1",
+          slug: "unit-1",
           description: `Learn the basics of ${course.title}`,
           order: 1,
         },
         {
           courseId: course.id,
           title: "Unit 2",
+          slug: "unit-2",
           description: `Learn intermediate ${course.title}`,
           order: 2,
         },
       ])
       .returning();
+
+    // =============================
+    // 3.5 INSERT MATERIALS (PER UNIT)
+    // =============================
+    for (const unit of units) {
+      await db.insert(schema.materials).values([
+        {
+          unitId: unit.id,
+          title: `Materi ${unit.title}`,
+          order: 1,
+          content: `
+## ${unit.title}
+
+Ini adalah materi pembelajaran untuk **${unit.title}**.
+
+### Pembahasan:
+- Penjelasan konsep dasar
+- Contoh soal
+- Tips mengerjakan soal CPNS
+
+### Catatan Penting:
+Selalu prioritaskan logika dan ketelitian.
+      `,
+        },
+      ]);
+    }
 
     // =============================
     // 4. INSERT LESSONS + CHALLENGES

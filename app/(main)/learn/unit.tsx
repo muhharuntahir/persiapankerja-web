@@ -7,6 +7,7 @@ type Props = {
   id: number;
   order: number;
   title: string;
+  unitSlug: string;
   description: string;
   lessons: (typeof lessons.$inferSelect & {
     completed: boolean;
@@ -23,6 +24,7 @@ export const Unit = ({
   id,
   order,
   title,
+  unitSlug,
   description,
   lessons,
   activeLesson,
@@ -30,8 +32,8 @@ export const Unit = ({
 }: Props) => {
   return (
     <>
-      <UnitBanner title={title} description={description} />
-      <div className="flex items-center flex-col relative">
+      <UnitBanner unitSlug={unitSlug} title={title} description={description} />
+      <div className="flex items-center flex-col relative mt-4">
         {lessons.map((lesson, index) => {
           const isCurrent = lesson.id === activeLesson?.id;
           const isLocked = !lesson.completed && !isCurrent;
@@ -40,6 +42,7 @@ export const Unit = ({
             <LessonButton
               key={lesson.id}
               id={lesson.id}
+              title={lesson.title}
               index={index}
               totalCount={lessons.length - 1}
               current={isCurrent}

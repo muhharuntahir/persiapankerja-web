@@ -23,6 +23,7 @@ export const coursesRelations = relations(courses, ({ many }) => ({
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(), // Unit 1
+  slug: text("slug").notNull().unique(),
   description: text("description").notNull(), // Learn the basics of spanish
   courseId: integer("course_id")
     .references(() => courses.id, { onDelete: "cascade" })
@@ -150,3 +151,43 @@ export const userSubscription = pgTable("user_subscription", {
   transactionTime: timestamp("transaction_time"),
   transactionId: text("transaction_id"),
 });
+
+export const materials = pgTable("materials", {
+  id: serial("id").primaryKey(),
+  unitId: integer("unit_id")
+    .references(() => units.id, { onDelete: "cascade" })
+    .notNull(),
+
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const materialsRelations = relations(materials, ({ one, many }) => ({
+  unit: one(units, {
+    fields: [materials.unitId],
+    references: [units.id],
+  }),
+  progress: many(materialProgress), // ✅ INI PENTING
+}));
+
+export const materialProgress = pgTable("material_progress", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  materialId: integer("material_id")
+    .references(() => materials.id, { onDelete: "cascade" })
+    .notNull(),
+  completed: boolean("completed").default(false),
+  completedAt: timestamp("completed_at"),
+});
+
+export const materialProgressRelations = relations(
+  materialProgress,
+  ({ one }) => ({
+    material: one(materials, {
+      fields: [materialProgress.materialId],
+      references: [materials.id],
+    }),
+  })
+);

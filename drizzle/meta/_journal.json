@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1765773793679,
+      "tag": "0000_cool_stellaris",
+      "breakpoints": true
+    }
+  ]
+}

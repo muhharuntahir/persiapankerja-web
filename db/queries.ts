@@ -1,7 +1,7 @@
 // db/queries.ts
 
 import { cache } from "react";
-import { eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import db from "@/db/drizzle";
 import {
@@ -11,6 +11,8 @@ import {
   units,
   userProgress,
   userSubscription,
+  materials,
+  materialProgress,
 } from "@/db/schema";
 
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
@@ -42,6 +44,12 @@ export const getUserProgress = cache(async () => {
 /* ============================
    UNITS (berisi lessons + challenges)
 =============================== */
+// export const getAllUnits = cache(async () => {
+//   return db.query.units.findMany({
+//     orderBy: (u, { asc }) => [asc(u.order)],
+//   });
+// });
+
 export const getUnits = cache(async () => {
   const user = await getAuthUser();
   const progress = await getUserProgress();
@@ -273,3 +281,81 @@ export const getTopTenUsers = cache(async () => {
     },
   });
 });
+
+/* ============================
+   MATERIALS
+=============================== */
+export async function getUnitBySlug(slug: string) {
+  return db.query.units.findFirst({
+    where: eq(units.slug, slug),
+  });
+}
+
+export const getMaterialsByUnit = async (unitId: number, userId: string) => {
+  const rows = await db
+    .select({
+      id: materials.id,
+      title: materials.title,
+      order: materials.order,
+      completed: materialProgress.completed,
+    })
+    .from(materials)
+    .leftJoin(
+      materialProgress,
+      and(
+        eq(materialProgress.materialId, materials.id),
+        eq(materialProgress.userId, userId)
+      )
+    )
+    .where(eq(materials.unitId, unitId))
+    .orderBy(asc(materials.order));
+
+  return rows.map((m) => ({
+    id: m.id,
+    title: m.title,
+    completed: Boolean(m.completed),
+  }));
+};
+
+/**
+ * Ambil 1 materi + status completed user
+ */
+export const getMaterialById = cache(
+  async (materialId: number, unitId: number, userId: string) => {
+    const data = await db
+      .select({
+        id: materials.id,
+        title: materials.title,
+        content: materials.content,
+        order: materials.order,
+        unitId: materials.unitId,
+        createdAt: materials.createdAt,
+        completed: materialProgress.completed,
+      })
+      .from(materials)
+      .leftJoin(
+        materialProgress,
+        and(
+          eq(materialProgress.materialId, materials.id),
+          eq(materialProgress.userId, userId)
+        )
+      )
+      .where(and(eq(materials.id, materialId), eq(materials.unitId, unitId)))
+      .limit(1);
+
+    return data[0] ?? null;
+  }
+);
+
+export const getFirstMaterialByUnitSlug = async (unitSlug: string) => {
+  const unit = await db.query.units.findFirst({
+    where: eq(units.slug, unitSlug),
+  });
+
+  if (!unit) return null;
+
+  return db.query.materials.findFirst({
+    where: eq(materials.unitId, unit.id),
+    orderBy: (m, { asc }) => [asc(m.order)],
+  });
+};

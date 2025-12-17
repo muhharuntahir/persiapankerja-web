@@ -42,7 +42,7 @@ export default async function Home() {
             </>
           ) : (
             <Button size="lg" variant="secondary" className="w-full" asChild>
-              <Link href="/learn">Continue Learning</Link>
+              <Link href="/learn">Lanjutkan Pembelajaran</Link>
             </Button>
           )}
         </div>
