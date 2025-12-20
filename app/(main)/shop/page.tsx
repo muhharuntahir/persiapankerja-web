@@ -12,6 +12,8 @@ import { getUserProgress, getUserSubscription } from "@/db/queries";
 
 import { Items } from "./items";
 import { Quests } from "@/components/quests";
+import Subscription from "./subscription";
+import { History } from "lucide-react";
 
 const ShopPage = async () => {
   const [userProgress, userSubscription] = await Promise.all([
@@ -54,6 +56,12 @@ const ShopPage = async () => {
             hasActiveSubscription={isPro}
           />
         </div>
+
+        {isPro && (
+          <div className="w-full">
+            <Subscription />
+          </div>
+        )}
       </FeedWrapper>
     </div>
   );

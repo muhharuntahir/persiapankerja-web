@@ -6,7 +6,7 @@ export const quests = [
     value: 20,
   },
   {
-    title: "Dapatkan XP",
+    title: "Dapatkan 50 XP",
     value: 50,
   },
   {

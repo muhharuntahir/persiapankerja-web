@@ -41,7 +41,7 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
   };
 
   const onSettings = () => {
-    window.location.href = "/settings/subscription";
+    window.location.href = "/shop";
   };
 
   return (

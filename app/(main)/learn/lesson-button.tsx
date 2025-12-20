@@ -33,7 +33,7 @@ export const LessonButton = ({
 
   const handleClick = () => {
     if (locked) return;
-    router.push(`/lesson/${id}`);
+    router.replace(`/lesson/${id}`);
   };
 
   return (

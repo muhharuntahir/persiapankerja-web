@@ -1,7 +1,7 @@
 // db/queries.ts
 
 import { cache } from "react";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 
 import db from "@/db/drizzle";
 import {
@@ -13,6 +13,7 @@ import {
   userSubscription,
   materials,
   materialProgress,
+  lessonProgress,
 } from "@/db/schema";
 
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
@@ -44,12 +45,6 @@ export const getUserProgress = cache(async () => {
 /* ============================
    UNITS (berisi lessons + challenges)
 =============================== */
-// export const getAllUnits = cache(async () => {
-//   return db.query.units.findMany({
-//     orderBy: (u, { asc }) => [asc(u.order)],
-//   });
-// });
-
 export const getUnits = cache(async () => {
   const user = await getAuthUser();
   const progress = await getUserProgress();

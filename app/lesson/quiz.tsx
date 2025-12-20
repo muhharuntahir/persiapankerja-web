@@ -180,7 +180,7 @@ export const Quiz = ({
             width={50}
           />
           <h1 className="text-xl lg:text-3xl font-bold text-neutral-700">
-            Kerja Bagus! <br /> Kamu telah menyelesaikan pelajaran.
+            Great job! <br /> You&apos;ve completed the lesson.
           </h1>
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard variant="points" value={challenges.length * 10} />
@@ -198,7 +198,7 @@ export const Quiz = ({
 
   const title =
     challenge.type === "ASSIST"
-      ? "Pilih jawaban yang tepat"
+      ? "Select the correct meaning"
       : challenge.question;
 
   return (

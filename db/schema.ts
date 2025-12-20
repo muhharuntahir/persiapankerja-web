@@ -6,6 +6,7 @@ import {
   pgTable,
   serial,
   text,
+  unique,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -55,6 +56,7 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
     references: [units.id],
   }),
   challenges: many(challenges),
+  lessonProgress: many(lessonProgress),
 }));
 
 export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
@@ -120,11 +122,20 @@ export const challengeProgressRelations = relations(
 
 export const userProgress = pgTable("user_progress", {
   userId: text("user_id").primaryKey(),
+
   userName: text("user_name").notNull().default("User"),
   userImageSrc: text("user_image_src").notNull().default("/mascot.svg"),
+
   activeCourseId: integer("active_course_id").references(() => courses.id, {
     onDelete: "cascade",
   }),
+
+  // 🔥 TAMBAHAN PENTING
+  activeLessonId: integer("active_lesson_id").references(() => lessons.id, {
+    onDelete: "set null",
+  }),
+  activeChallengeIndex: integer("active_challenge_index").notNull().default(0),
+
   hearts: integer("hearts").notNull().default(5),
   points: integer("points").notNull().default(0),
 });
@@ -201,3 +212,27 @@ export const materialProgressRelations = relations(
     }),
   })
 );
+
+export const lessonProgress = pgTable(
+  "lesson_progress",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    lessonId: integer("lesson_id")
+      .references(() => lessons.id, { onDelete: "cascade" })
+      .notNull(),
+
+    completed: boolean("completed").notNull().default(false),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (t) => ({
+    lessonUserUnique: unique("lesson_user_unique").on(t.userId, t.lessonId),
+  })
+);
+
+export const lessonProgressRelations = relations(lessonProgress, ({ one }) => ({
+  lesson: one(lessons, {
+    fields: [lessonProgress.lessonId],
+    references: [lessons.id],
+  }),
+}));
