@@ -25,6 +25,10 @@ const LessonIdPage = async ({ params }: Props) => {
     redirect("/learn");
   }
 
+  if (userProgress.hearts === 0 && !userSubscription?.isActive) {
+    redirect("/learn");
+  }
+
   const initialPercentage =
     (lesson.challenges.filter((challenge) => challenge.completed).length /
       lesson.challenges.length) *

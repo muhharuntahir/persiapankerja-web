@@ -24,7 +24,12 @@ export const HeartsModal = () => {
 
   const onClick = () => {
     close();
-    router.push("/store");
+    router.push("/shop");
+  };
+
+  const onReject = () => {
+    close();
+    router.replace("/learn");
   };
 
   if (!isClient) {
@@ -32,7 +37,7 @@ export const HeartsModal = () => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={close}>
+    <Dialog open={isOpen} onOpenChange={onReject}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center w-full justify-center mb-5">
@@ -59,7 +64,7 @@ export const HeartsModal = () => {
               variant="primaryOutline"
               className="w-full"
               size="lg"
-              onClick={close}
+              onClick={onReject}
             >
               Tidak, terima kasih
             </Button>

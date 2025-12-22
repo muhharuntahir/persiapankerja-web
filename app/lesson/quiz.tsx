@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
@@ -74,14 +74,24 @@ export const Quiz = ({
     return uncompletedIndex === -1 ? 0 : uncompletedIndex;
   });
 
+  const [currentIndex, setCurrentIndex] = useState(activeIndex);
+
   const [selectedOption, setSelectedOption] = useState<number>();
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
+
+  const [finishing, setFinishing] = useState(false);
 
   const challenge = challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
 
+  // const onNext = () => {
+  //   setActiveIndex((current) => current + 1);
+  // };
   const onNext = () => {
-    setActiveIndex((current) => current + 1);
+    setActiveIndex((i) => {
+      setCurrentIndex(i + 1);
+      return i + 1;
+    });
   };
 
   const onSelect = (id: number) => {
@@ -89,6 +99,16 @@ export const Quiz = ({
 
     setSelectedOption(id);
   };
+
+  // ⛔ BLOCK QUIZ JIKA HEART HABIS
+  useEffect(() => {
+    if (hearts <= 0 && !userSubscription?.isActive) {
+      openHeartsModal();
+
+      // Paksa keluar dari lesson
+      router.replace("/learn");
+    }
+  }, [hearts]);
 
   const onContinue = () => {
     if (!selectedOption) return;
@@ -109,49 +129,73 @@ export const Quiz = ({
     const correctOption = options.find((option) => option.correct);
 
     if (!correctOption) {
+      toast.error("Soal tidak valid.");
       return;
     }
 
-    if (correctOption.id === selectedOption) {
-      startTransition(() => {
-        upsertChallengeProgress(challenge.id)
-          .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
+    // Penambahan UI tidak menunggu server & Feedback instan
+    const isCorrect = correctOption.id === selectedOption;
 
-            correctControls.play();
-            setStatus("correct");
-            setPercentage((prev) => prev + 100 / challenges.length);
-
-            // This is a practice
-            if (initialPercentage === 100) {
-              setHearts((prev) => Math.min(prev + 1, 5));
-            }
-          })
-          .catch(() => toast.error("Something went wrong. Please try again."));
-      });
+    if (isCorrect) {
+      correctControls.play();
+      setStatus("correct");
+      setPercentage((p) => p + 100 / challenges.length);
     } else {
+      incorrectControls.play();
+      setStatus("wrong");
+
+      // 🔥 UI langsung update (instan)
+      setHearts((prev) => Math.max(prev - 1, 0));
+
+      // 🔥 SIMPAN KE DATABASE (async, tidak blocking UI)
       startTransition(() => {
         reduceHearts(challenge.id)
           .then((response) => {
             if (response?.error === "hearts") {
               openHeartsModal();
-              return;
-            }
-
-            incorrectControls.play();
-            setStatus("wrong");
-
-            if (!response?.error) {
-              setHearts((prev) => Math.max(prev - 1, 0));
             }
           })
-          .catch(() => toast.error("Something went wrong. Please try again."));
+          .catch(() => {
+            toast.error("Gagal mengurangi heart");
+          });
       });
+
+      return;
     }
+
+    startTransition(() => {
+      upsertChallengeProgress(challenge.id)
+        .then((response) => {
+          if (response?.error === "hearts") {
+            openHeartsModal();
+          }
+        })
+        .catch(() => {
+          toast.error("Something went wrong. Please try again.");
+        });
+    });
   };
+
+  const handleFinish = async () => {
+    setFinishing(true);
+    await new Promise((r) => setTimeout(r, 600)); // UX delay
+    router.push("/learn");
+  };
+
+  useEffect(() => {
+    const handleExit = () => {
+      navigator.sendBeacon(
+        "/api/save-progress",
+        JSON.stringify({
+          lessonId,
+          challengeIndex: currentIndex,
+        })
+      );
+    };
+
+    window.addEventListener("beforeunload", handleExit);
+    return () => window.removeEventListener("beforeunload", handleExit);
+  }, [currentIndex]);
 
   if (!challenge) {
     return (
@@ -185,12 +229,16 @@ export const Quiz = ({
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard variant="points" value={challenges.length * 10} />
             <ResultCard variant="hearts" value={hearts} />
+            {finishing && (
+              <p className="text-sm text-neutral-500 mt-2">Menyimpan hasil…</p>
+            )}
           </div>
         </div>
         <Footer
           lessonId={lessonId}
           status="completed"
-          onCheck={() => router.push("/learn")}
+          // onCheck={() => router.push("/learn")}
+          onCheck={handleFinish}
         />
       </>
     );
@@ -233,7 +281,8 @@ export const Quiz = ({
         </div>
       </div>
       <Footer
-        disabled={pending || !selectedOption}
+        // disabled={pending || !selectedOption}
+        disabled={status === "none" && !selectedOption}
         status={status}
         onCheck={onContinue}
       />

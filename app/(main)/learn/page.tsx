@@ -16,6 +16,7 @@ import {
 
 import { Unit } from "./unit";
 import { Header } from "./header";
+// import { DailyLesson } from "./daily-lesson";
 
 const LearnPage = async () => {
   const userProgressData = getUserProgress();
@@ -62,6 +63,15 @@ const LearnPage = async () => {
       </StickyWrapper>
       <FeedWrapper>
         <Header title={userProgress.activeCourse.title} />
+        {/* <DailyLesson
+          id={312}
+          index={312}
+          title="Latihan Harian"
+          totalCount={0}
+          percentage={0}
+          current
+        /> */}
+
         {units.map((unit) => (
           <div key={unit.id} className="mb-10">
             <Unit
