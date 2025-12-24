@@ -19,6 +19,9 @@ const buttonVariants = cva(
         secondary:
           "bg-sky-500 text-primary-foreground hover:bg-sky-500/90 border-sky-600 border-b-4 active:border-b-0",
         secondaryOutline: "bg-white text-sky-500 hover:bg-slate-100",
+        tertiary:
+          "bg-amber-500 text-primary-foreground hover:bg-amber-500/90 border-amber-600 border-b-4 active:border-b-0",
+        tertiaryOutline: "bg-white text-amber-500 hover:bg-slate-100",
         danger:
           "bg-rose-500 text-primary-foreground hover:bg-rose-500/90 border-rose-600 border-b-4 active:border-b-0",
         dangerOutline: "bg-white text-rose-500 hover:bg-slate-100",

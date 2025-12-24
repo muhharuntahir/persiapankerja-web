@@ -1,5 +1,6 @@
 import {
   getMaterialsByUnit,
+  getUserSubscription,
   getMaterialById,
   getUnitBySlug,
   getNextLessonLinkByUnit,
@@ -10,7 +11,7 @@ import MaterialSidebar from "../../material-sidebar";
 import MaterialContent from "../../material-content";
 import MaterialFooter from "../../footer";
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
 
 type PageProps = {
@@ -22,6 +23,11 @@ type PageProps = {
 
 export default async function MaterialPage({ params }: PageProps) {
   const { unitSlug, materialId } = params;
+
+  const subscription = await getUserSubscription();
+  if (!subscription?.isActive) {
+    redirect("/learn");
+  }
 
   const supabase = createServerSupabaseClient();
   const {
