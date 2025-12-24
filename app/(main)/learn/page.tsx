@@ -5,6 +5,7 @@ import { Quests } from "@/components/quests";
 import { FeedWrapper } from "@/components/feed-wrapper";
 import { UserProgress } from "@/components/user-progress";
 import { StickyWrapper } from "@/components/sticky-wrapper";
+import { DailyLessonCard } from "./daily-lesson-card";
 import { lessons, units as unitsSchema } from "@/db/schema";
 import {
   getCourseProgress,
@@ -39,6 +40,8 @@ const LearnPage = async () => {
     userSubscriptionData,
   ]);
 
+  const canShowDaily = units.length >= 5;
+
   if (!userProgress || !userProgress.activeCourse) {
     redirect("/courses");
   }
@@ -63,14 +66,7 @@ const LearnPage = async () => {
       </StickyWrapper>
       <FeedWrapper>
         <Header title={userProgress.activeCourse.title} />
-        {/* <DailyLesson
-          id={312}
-          index={312}
-          title="Latihan Harian"
-          totalCount={0}
-          percentage={0}
-          current
-        /> */}
+        <DailyLessonCard available={canShowDaily} />
 
         {units.map((unit) => (
           <div key={unit.id} className="mb-10">
@@ -83,6 +79,7 @@ const LearnPage = async () => {
               lessons={unit.lessons}
               activeLesson={courseProgress.activeLesson}
               activeLessonPercentage={lessonPercentage}
+              isPro={isPro}
             />
           </div>
         ))}

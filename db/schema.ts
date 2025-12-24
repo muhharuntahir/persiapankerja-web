@@ -69,6 +69,9 @@ export const challenges = pgTable("challenges", {
   type: challengesEnum("type").notNull(),
   question: text("question").notNull(),
   order: integer("order").notNull(),
+
+  // Tambahan
+  timeLimitSec: integer("time_limit_sec").notNull().default(30),
 });
 
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
@@ -236,3 +239,45 @@ export const lessonProgressRelations = relations(lessonProgress, ({ one }) => ({
     references: [lessons.id],
   }),
 }));
+
+/* ====================
+ * Daily Lesson Session
+ * ===================== */
+export const dailyLessonSession = pgTable(
+  "daily_lesson_session",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    date: text("date").notNull(), // YYYY-MM-DD
+    completed: boolean("completed").default(false),
+    totalXp: integer("total_xp").default(0),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (t) => ({
+    uniqueUserDaily: unique("user_daily_unique").on(t.userId, t.date),
+  })
+);
+
+/* ====================
+ * Daily Lesson Questions
+ * ===================== */
+export const dailyLessonQuestions = pgTable("daily_lesson_questions", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").references(() => dailyLessonSession.id, {
+    onDelete: "cascade",
+  }),
+  challengeId: integer("challenge_id").notNull(),
+  order: integer("order").notNull(),
+});
+
+/* ====================
+ * Daily Lesson Answers
+ * ===================== */
+export const dailyLessonAnswers = pgTable("daily_lesson_answers", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").notNull(),
+  challengeId: integer("challenge_id").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
+  timeSpentMs: integer("time_spent_ms").notNull(),
+  xp: integer("xp").notNull(),
+});

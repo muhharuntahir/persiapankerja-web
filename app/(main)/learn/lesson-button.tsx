@@ -14,6 +14,7 @@ type Props = {
   totalCount: number;
   locked?: boolean;
   current?: boolean;
+  completed: boolean;
   percentage: number;
 };
 
@@ -24,11 +25,13 @@ export const LessonButton = ({
   totalCount,
   locked,
   current,
+  completed,
   percentage,
 }: Props) => {
   const isLast = index === totalCount;
   const router = useRouter();
-  const isCompleted = !locked && !current;
+  // const isCompleted = !locked && !current;
+  const isCompleted = completed;
   const Icon = isCompleted ? Check : isLast ? Crown : Star;
 
   const handleClick = () => {
