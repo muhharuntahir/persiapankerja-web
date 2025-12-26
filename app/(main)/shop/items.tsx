@@ -7,7 +7,8 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { POINTS_TO_REFILL } from "@/constants";
 import { refillHearts } from "@/actions/user-progress";
-import { createMidtransPayment } from "@/actions/user-subscription";
+import { useRouter } from "next/navigation";
+// import { createMidtransPayment } from "@/actions/user-subscription";
 
 type Props = {
   hearts: number;
@@ -17,6 +18,8 @@ type Props = {
 
 export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
   const [pending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   const onRefillHearts = () => {
     if (pending || hearts === 5 || points < POINTS_TO_REFILL) {
@@ -28,16 +31,19 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
     });
   };
 
+  // const onUpgrade = () => {
+  //   startTransition(() => {
+  //     createMidtransPayment()
+  //       .then((res: any) => {
+  //         if (res?.redirectUrl) {
+  //           window.location.href = res.redirectUrl;
+  //         }
+  //       })
+  //       .catch(() => toast.error("Something went wrong"));
+  //   });
+  // };
   const onUpgrade = () => {
-    startTransition(() => {
-      createMidtransPayment()
-        .then((res: any) => {
-          if (res?.redirectUrl) {
-            window.location.href = res.redirectUrl;
-          }
-        })
-        .catch(() => toast.error("Something went wrong"));
-    });
+    router.push("/shop/checkout"); // ✅ BENAR
   };
 
   const onSettings = () => {

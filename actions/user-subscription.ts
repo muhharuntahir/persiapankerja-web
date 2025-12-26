@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
-import { createMidtransClient } from "@/lib/midtrans";
+import { createMidtransClient } from "@/lib/midtrans-snap";
 import { nanoid } from "nanoid";
 import db from "@/db/drizzle";
 import { userSubscription } from "@/db/schema";
@@ -45,26 +45,6 @@ export const createMidtransPayment = async () => {
     paymentStatus: "pending",
     grossAmount: PRICE,
   });
-  // await db
-  //   .insert(userSubscription)
-  //   .values({
-  //     userId: user.id,
-  //     orderId,
-  //     paymentStatus: "pending",
-  //     grossAmount: PRICE,
-  //     isActive: false,
-  //     expiresAt: null,
-  //   })
-  //   .onConflictDoUpdate({
-  //     target: userSubscription.userId,
-  //     set: {
-  //       orderId,
-  //       paymentStatus: "pending",
-  //       grossAmount: PRICE,
-  //       isActive: false,
-  //       expiresAt: null,
-  //     },
-  //   });
 
   // 6. Return Snap Token
   return {
