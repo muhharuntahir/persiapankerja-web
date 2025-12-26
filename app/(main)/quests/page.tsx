@@ -8,6 +8,7 @@ import { getUserProgress, getUserSubscription } from "@/db/queries";
 import { Progress } from "@/components/ui/progress";
 import { Promo } from "@/components/promo";
 import { quests } from "@/constants";
+import { MainWrapper } from "@/components/main-wrapper";
 
 const QuestsPage = async () => {
   const userProgressData = getUserProgress();
@@ -25,7 +26,7 @@ const QuestsPage = async () => {
   const isPro = !!userSubscription?.isActive;
 
   return (
-    <div className="flex flex-row-reverse gap-[48px] px-6">
+    <MainWrapper>
       <StickyWrapper>
         <UserProgress
           activeCourse={userProgress.activeCourse}
@@ -50,7 +51,7 @@ const QuestsPage = async () => {
 
               return (
                 <div
-                  className="flex items-center w-full p-4 gap-x-4 border-t-2"
+                  className="flex items-center w-full px-4 py-6 gap-x-4 bg-white rounded-xl mb-3 border-2"
                   key={quest.title}
                 >
                   <Image
@@ -63,7 +64,7 @@ const QuestsPage = async () => {
                     <p className="text-neutral-700 text-xl font-bold">
                       {quest.title}
                     </p>
-                    <Progress value={progress} className="h-3" />
+                    <Progress value={progress} className="h-3 " />
                   </div>
                 </div>
               );
@@ -71,7 +72,7 @@ const QuestsPage = async () => {
           </ul>
         </div>
       </FeedWrapper>
-    </div>
+    </MainWrapper>
   );
 };
 

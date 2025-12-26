@@ -14,6 +14,7 @@ import { Items } from "./items";
 import { Quests } from "@/components/quests";
 import Subscription from "./subscription";
 import { History } from "lucide-react";
+import { MainWrapper } from "@/components/main-wrapper";
 
 const ShopPage = async () => {
   const [userProgress, userSubscription] = await Promise.all([
@@ -28,7 +29,7 @@ const ShopPage = async () => {
   const isPro = userSubscription?.isActive === true;
 
   return (
-    <div className="flex flex-row-reverse gap-[48px] px-6">
+    <MainWrapper>
       <StickyWrapper>
         <UserProgress
           activeCourse={userProgress.activeCourse}
@@ -63,7 +64,7 @@ const ShopPage = async () => {
           </div>
         )}
       </FeedWrapper>
-    </div>
+    </MainWrapper>
   );
 };
 

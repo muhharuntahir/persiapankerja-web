@@ -91,7 +91,7 @@ export default function CheckoutPage() {
       </Section>
 
       {/* E-MONEY */}
-      <Section title="E-Money">
+      {/* <Section title="E-Money">
         <Option
           id="gopay"
           label="GoPay"
@@ -104,20 +104,20 @@ export default function CheckoutPage() {
           method={method}
           setMethod={setMethod}
         />
-      </Section>
+      </Section> */}
 
       {/* QR */}
-      <Section title="QRIS">
+      {/* <Section title="QRIS">
         <Option
           id="qris"
           label="QRIS (Semua E-Wallet)"
           method={method}
           setMethod={setMethod}
         />
-      </Section>
+      </Section> */}
 
       {/* RETAIL */}
-      <Section title="Gerai Retail">
+      {/* <Section title="Gerai Retail">
         <Option
           id="alfamart"
           label="Alfamart"
@@ -130,10 +130,10 @@ export default function CheckoutPage() {
           method={method}
           setMethod={setMethod}
         />
-      </Section>
+      </Section> */}
 
       {/* CARDLESS CREDIT */}
-      <Section title="Cicilan Tanpa Kartu">
+      {/* <Section title="Cicilan Tanpa Kartu">
         <Option
           id="akulaku"
           label="Akulaku"
@@ -146,17 +146,17 @@ export default function CheckoutPage() {
           method={method}
           setMethod={setMethod}
         />
-      </Section>
+      </Section> */}
 
       {/* CREDIT CARD */}
-      <Section title="Kartu Kredit">
+      {/* <Section title="Kartu Kredit">
         <Option
           id="credit_card"
           label="Kartu Kredit / Debit"
           method={method}
           setMethod={setMethod}
         />
-      </Section>
+      </Section> */}
 
       <Button
         className="w-full mt-8"

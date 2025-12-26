@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Promo } from "@/components/promo";
 import { Quests } from "@/components/quests";
+import { MainWrapper } from "@/components/main-wrapper";
 
 const LearderboardPage = async () => {
   const userProgressData = getUserProgress();
@@ -32,7 +33,7 @@ const LearderboardPage = async () => {
   const isPro = !!userSubscription?.isActive;
 
   return (
-    <div className="flex flex-row-reverse gap-[48px] px-6">
+    <MainWrapper>
       <StickyWrapper>
         <UserProgress
           activeCourse={userProgress.activeCourse}
@@ -78,7 +79,7 @@ const LearderboardPage = async () => {
           ))}
         </div>
       </FeedWrapper>
-    </div>
+    </MainWrapper>
   );
 };
 
