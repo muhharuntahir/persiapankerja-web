@@ -246,7 +246,7 @@ export const Quiz = ({
 
   const title =
     challenge.type === "ASSIST"
-      ? "Select the correct meaning"
+      ? "Pilih jawaban yang tepat"
       : challenge.question;
 
   return (
