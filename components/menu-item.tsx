@@ -15,6 +15,7 @@ type Props = {
 export const MenuItem = ({ label = "", iconSrc, href }: Props) => {
   const pathname = usePathname();
   const active = pathname === href;
+  const isLabel = !!label;
 
   return (
     <Button
@@ -23,7 +24,9 @@ export const MenuItem = ({ label = "", iconSrc, href }: Props) => {
       asChild
     >
       <Link href={href}>
-        {label ? (
+        {!isLabel ? (
+          <Image src={iconSrc} alt={label} height={32} width={32} />
+        ) : (
           <Image
             src={iconSrc}
             alt={label}
@@ -31,8 +34,6 @@ export const MenuItem = ({ label = "", iconSrc, href }: Props) => {
             height={32}
             width={32}
           />
-        ) : (
-          <Image src={iconSrc} alt={label} height={32} width={32} />
         )}
         {label}
       </Link>

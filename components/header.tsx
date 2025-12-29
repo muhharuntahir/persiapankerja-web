@@ -24,12 +24,18 @@ export const Header = () => {
 
       <div className="flex items-center gap-x-5">
         {/* MENU UTAMA */}
-        <div className="flex flex-col gap-y-2 flex-1">
-          <MenuItem label="" href="/notification" iconSrc="/notification.svg" />
-        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex flex-col gap-y-2 flex-1">
+            <MenuItem
+              label=""
+              href="/notification"
+              iconSrc="/notification.svg"
+            />
+          </div>
 
-        <div className="flex flex-col gap-y-2 flex-1">
-          <MenuItem label="" href="/shop" iconSrc="/shop.svg" />
+          <div className="flex flex-col gap-y-2 flex-1">
+            <MenuItem label="TOKO" href="/shop" iconSrc="/shop.svg" />
+          </div>
         </div>
 
         <div className="flex items-center gap-x-3">

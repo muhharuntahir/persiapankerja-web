@@ -10,6 +10,8 @@ import { challengeProgress, challenges, userProgress } from "@/db/schema";
 
 import { getUserProgress, getUserSubscription } from "@/db/queries";
 
+import { updateLessonProgress } from "./lesson-progress";
+
 export const upsertChallengeProgress = async (challengeId: number) => {
   const supabase = createServerSupabaseClient();
 
@@ -98,6 +100,9 @@ export const upsertChallengeProgress = async (challengeId: number) => {
     challengeId,
     completed: true,
   });
+
+  // Update progress lesson
+  await updateLessonProgress(lessonId);
 
   // Tambah points
   await db

@@ -54,7 +54,7 @@ export const LessonButton = ({
 
         {/* RIGHT ICON */}
         <div className="relative" style={{}}>
-          {current ? (
+          {current && !completed ? (
             <div className="h-[80px] w-[80px] relative">
               <div className="absolute -top-6 left-[0.2rem] px-3 py-2.5 border-2 font-semibold text-sm uppercase text-sky-500 bg-white rounded-xl animate-bounce tracking-wide z-10">
                 Mulai

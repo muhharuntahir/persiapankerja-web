@@ -11,6 +11,7 @@ type Props = {
   description: string;
   lessons: (typeof lessons.$inferSelect & {
     completed: boolean;
+    percentage: number;
   })[];
   activeLesson:
     | (typeof lessons.$inferSelect & {
@@ -58,11 +59,11 @@ export const Unit = ({
               ? true
               : index !== 0 && !previousLesson?.completed;
 
-            const isCurrent =
-              lesson.id === activeLesson?.id ||
-              (index === 0 &&
-                !lesson.completed &&
-                !lessons.some((l) => l.id === activeLesson?.id));
+            const firstUncompletedLesson = lessons.find(
+              (lesson) => !lesson.completed
+            );
+
+            const isCurrent = lesson.id === firstUncompletedLesson?.id;
 
             return (
               <LessonButton
@@ -74,44 +75,12 @@ export const Unit = ({
                 locked={isLocked}
                 current={isCurrent}
                 completed={lesson.completed}
-                percentage={isCurrent ? activeLessonPercentage : 0}
+                percentage={lesson.percentage}
               />
             );
           })}
         </div>
       </div>
-
-      {/* <div className="flex items-center flex-col relative mt-4">
-        {lessons.map((lesson, index) => {
-          const previousLesson = lessons[index - 1];
-
-          // 🔒 terkunci jika bukan lesson pertama & lesson sebelumnya belum selesai
-          const isLocked = !isPro
-            ? true
-            : index !== 0 && !previousLesson?.completed;
-
-          // 🔥 CURRENT LOGIC YANG BENAR
-          const isCurrent =
-            lesson.id === activeLesson?.id ||
-            (index === 0 &&
-              !lesson.completed &&
-              !lessons.some((l) => l.id === activeLesson?.id));
-
-          return (
-            <LessonButton
-              key={lesson.id}
-              id={lesson.id}
-              title={lesson.title}
-              index={index}
-              totalCount={lessons.length - 1}
-              locked={isLocked}
-              current={isCurrent}
-              completed={lesson.completed}
-              percentage={isCurrent ? activeLessonPercentage : 0}
-            />
-          );
-        })}
-      </div> */}
     </>
   );
 };

@@ -1,18 +1,19 @@
+// actions/lesson-progress.ts
 "use server";
 
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
 import db from "@/db/drizzle";
-import {
-  challenges,
-  challengeProgress,
-  lessons,
-  lessonProgress,
-  userProgress,
-} from "@/db/schema";
+import { lessonProgress, challenges, challengeProgress } from "@/db/schema";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
 
-export async function completeLesson(lessonId: number) {
+/**
+ * Dipanggil setiap:
+ * - user menjawab challenge
+ * - user keluar di tengah lesson
+ */
+export async function updateLessonProgress(lessonId: number) {
   const supabase = createServerSupabaseClient();
   const {
     data: { user },
@@ -20,65 +21,41 @@ export async function completeLesson(lessonId: number) {
 
   if (!user) throw new Error("Unauthorized");
 
-  // 1️⃣ Ambil lesson
-  const lesson = await db.query.lessons.findFirst({
-    where: eq(lessons.id, lessonId),
-  });
-  if (!lesson) return;
-
-  // 2️⃣ Ambil semua challenge lesson
+  // ambil semua challenge lesson ini
   const lessonChallenges = await db.query.challenges.findMany({
     where: eq(challenges.lessonId, lessonId),
-  });
-  if (lessonChallenges.length === 0) return;
-
-  // 3️⃣ Ambil progress challenge user
-  const completed = await db.query.challengeProgress.findMany({
-    where: and(
-      eq(challengeProgress.userId, user.id),
-      eq(challengeProgress.completed, true)
-    ),
+    with: {
+      challengeProgress: {
+        where: eq(challengeProgress.userId, user.id),
+      },
+    },
   });
 
-  const completedIds = new Set(completed.map((c) => c.challengeId));
+  const total = lessonChallenges.length;
+  const completed = lessonChallenges.filter(
+    (c) =>
+      c.challengeProgress.length > 0 &&
+      c.challengeProgress.every((p) => p.completed)
+  ).length;
 
-  const allDone = lessonChallenges.every((c) => completedIds.has(c.id));
-  if (!allDone) return;
+  const isCompleted = total > 0 && completed === total;
 
-  // 4️⃣ SIMPAN lesson selesai
+  // UPSERT lesson_progress
   await db
     .insert(lessonProgress)
     .values({
       userId: user.id,
       lessonId,
-      completed: true,
+      completed: isCompleted,
     })
     .onConflictDoUpdate({
       target: [lessonProgress.userId, lessonProgress.lessonId],
       set: {
-        completed: true,
+        completed: isCompleted,
         updatedAt: new Date(),
       },
     });
 
-  // 5️⃣ Cari lesson berikutnya
-  const nextLesson = await db.query.lessons.findFirst({
-    where: and(
-      eq(lessons.unitId, lesson.unitId),
-      eq(lessons.order, lesson.order + 1)
-    ),
-  });
-
-  // 6️⃣ Update posisi user
-  await db
-    .update(userProgress)
-    .set({
-      activeLessonId: nextLesson?.id ?? lessonId,
-      activeChallengeIndex: 0,
-    })
-    .where(eq(userProgress.userId, user.id));
-
-  // 7️⃣ Revalidate UI
   revalidatePath("/learn");
   revalidatePath(`/lesson/${lessonId}`);
 }

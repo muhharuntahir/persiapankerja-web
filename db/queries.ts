@@ -51,44 +51,58 @@ export const getUnits = cache(async () => {
 
   if (!user || !progress?.activeCourseId) return [];
 
-  const data = await db.query.units.findMany({
-    orderBy: (t, { asc }) => [asc(t.order)],
+  const unitsData = await db.query.units.findMany({
+    orderBy: (u, { asc }) => [asc(u.order)],
     where: eq(units.courseId, progress.activeCourseId),
     with: {
       lessons: {
-        orderBy: (t, { asc }) => [asc(t.order)],
+        orderBy: (l, { asc }) => [asc(l.order)],
         with: {
           challenges: {
-            orderBy: (t, { asc }) => [asc(t.order)],
             with: {
               challengeProgress: {
                 where: eq(challengeProgress.userId, user.id),
               },
             },
           },
+          lessonProgress: {
+            where: eq(lessonProgress.userId, user.id),
+          },
         },
       },
     },
   });
 
-  // Normalize: cek apakah lesson sudah completed
-  return data.map((unit) => {
-    const lessonsWithStatus = unit.lessons.map((lesson) => {
-      if (lesson.challenges.length === 0) {
-        return { ...lesson, completed: false };
-      }
+  return unitsData.map((unit) => {
+    const lessonsWithProgress = unit.lessons.map((lesson) => {
+      const totalChallenges = lesson.challenges.length;
 
-      const allCompleted = lesson.challenges.every(
+      const completedChallenges = lesson.challenges.filter(
         (c) =>
-          c.challengeProgress &&
           c.challengeProgress.length > 0 &&
           c.challengeProgress.every((p) => p.completed)
-      );
+      ).length;
 
-      return { ...lesson, completed: allCompleted };
+      const percentage =
+        totalChallenges === 0
+          ? 0
+          : Math.round((completedChallenges / totalChallenges) * 100);
+
+      const completed =
+        lesson.lessonProgress.length > 0 &&
+        lesson.lessonProgress[0].completed === true;
+
+      return {
+        ...lesson,
+        completed,
+        percentage, // 🔥 INI YANG PENTING
+      };
     });
 
-    return { ...unit, lessons: lessonsWithStatus };
+    return {
+      ...unit,
+      lessons: lessonsWithProgress,
+    };
   });
 });
 
@@ -154,7 +168,8 @@ export const getCourseProgress = cache(async () => {
         return (
           !c.challengeProgress ||
           c.challengeProgress.length === 0 ||
-          c.challengeProgress.some((p) => p.completed === false)
+          // c.challengeProgress.some((p) => p.completed === false)
+          !c.challengeProgress.every((p) => p.completed)
         );
       })
     );
@@ -208,15 +223,50 @@ export const getLesson = cache(async (id?: number) => {
 /* ============================
    LESSON COMPLETION PERCENTAGE
 =============================== */
+/* ============================
+   LESSON COMPLETION PERCENTAGE (NEW)
+=============================== */
 export const getLessonPercentage = cache(async () => {
-  const progress = await getCourseProgress();
-  if (!progress?.activeLessonId) return 0;
+  const user = await getAuthUser();
+  if (!user) return 0;
 
-  const lesson = await getLesson(progress.activeLessonId);
-  if (!lesson) return 0;
+  // ambil lesson pertama yang BELUM completed
+  const lesson = await db.query.lessons.findFirst({
+    orderBy: (l, { asc }) => [asc(l.order)],
+    with: {
+      challenges: {
+        with: {
+          challengeProgress: {
+            where: eq(challengeProgress.userId, user.id),
+          },
+        },
+      },
+    },
+    where: (lessons, { notInArray }) =>
+      notInArray(
+        lessons.id,
+        db
+          .select({ lessonId: lessonProgress.lessonId })
+          .from(lessonProgress)
+          .where(
+            and(
+              eq(lessonProgress.userId, user.id),
+              eq(lessonProgress.completed, true)
+            )
+          )
+      ),
+  });
 
-  const completed = lesson.challenges.filter((c) => c.completed).length;
+  if (!lesson) return 100; // semua lesson selesai
+
   const total = lesson.challenges.length;
+  if (total === 0) return 0;
+
+  const completed = lesson.challenges.filter(
+    (c) =>
+      c.challengeProgress.length > 0 &&
+      c.challengeProgress.every((p) => p.completed)
+  ).length;
 
   return Math.round((completed / total) * 100);
 });

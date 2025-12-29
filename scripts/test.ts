@@ -288,9 +288,9 @@ function getOptionsForChallenge(order: number) {
       ];
     case 10:
       return [
-        { correct: false, text: "18" },
+        { correct: false, text: "19" },
         { correct: false, text: "22" },
-        { correct: true, text: "21" },
+        { correct: true, text: "18" },
         { correct: false, text: "24" },
       ];
 
